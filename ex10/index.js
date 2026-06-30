@@ -20,8 +20,7 @@ app.post("/membros", (req, res) => {
 app.get("/membros", (req, res) => {
     const id = req.query.id;
     if (id) {
-        res.send(membros.find((membro) => membro.id == id));
-        return;
+        return res.send(membros.find((membro) => membro.id == id));
     }
     res.send(membros);
 });
@@ -29,6 +28,9 @@ app.get("/membros", (req, res) => {
 // UPDATE
 app.put("/membros/:id", (req, res) => {
     const pos = membros.findIndex((membro) => membro.id == req.params.id);
+    if (pos == -1) {
+        return res.status(404).send();
+    }
     const novoNome = req.body.nome;
     const novoCurso = req.body.curso;
     membros[pos].nome = novoNome;
@@ -40,8 +42,11 @@ app.put("/membros/:id", (req, res) => {
 app.delete("/membros/:id", (req, res) => {
     const id = req.params.id;
     const pos = membros.findIndex((membro) => membro.id == id);
-    membros.splice(pos, 1);
-    res.send(membros);
+    if (pos != -1) {
+        membros.splice(pos, 1);
+        return res.send(membros);
+    }
+    res.status(404).send();
 });
 
 app.listen(PORT, () => {
